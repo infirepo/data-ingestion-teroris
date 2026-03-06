@@ -134,6 +134,10 @@ def main():
             template_path = os.path.join(template_dir, "rules_pk.json")
         elif doc_type == "PUTUSAN_PT":
             template_path = os.path.join(template_dir, "rules_pt.json")
+        elif doc_type == "PUTUSAN KASASI":
+            template_path = os.path.join(template_dir, "rules_k.json")
+        elif doc_type == "PUTUSAN MILITER":
+            template_path = os.path.join(template_dir, "rules_pm.json")
         else:
             template_path = os.path.join(template_dir, "rules_pn.json")
 
@@ -143,7 +147,6 @@ def main():
             continue
 
         try:
-            # Ubah daftar ini jika ingin membatasi field LLM yang diekstrak
             llm_fields_test = [
                 "indictment_model",
                 "charged_articles", 

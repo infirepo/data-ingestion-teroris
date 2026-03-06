@@ -5,3 +5,4 @@ pypdf
 PyMuPDF
 PyPDF4
 PyPDF2
+pandas

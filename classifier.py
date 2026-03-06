@@ -6,7 +6,8 @@ class DocumentClassifier:
             "PUTUSAN_PN": r"Nomor[:\s.]*\d+[\s/]*Pid[\.\s-]*Sus[\.\s-]*Teroris[\s/]*\d{4}[\s/]*PN",
             "PUTUSAN_PT": r"Nomor[:\s.]*\d+[\s/]*Pid[\.\s-]*Sus[\s/]*\d{4}[\s/]*PT",
             "PUTUSAN_KASASI": r"Nomor[:\s.]*\d+[\s/]*K[\s/]*Pid[\.\s-]*Sus[\s/]*\d{4}",
-            "PUTUSAN_PK": r"Nomor[:\s.]*\d+[\s/]*PK[\s/]*Pid[\.\s-]*Sus[\s/]*\d{4}"
+            "PUTUSAN_PK": r"Nomor[:\s.]*\d+[\s/]*PK[\s/]*Pid[\.\s-]*Sus[\s/]*\d{4}",
+            "PUTUSAN_MILITER": r"Nomor\s*[:\-]?\s*([0-9]+-[A-Z]/PM\s*[A-Z0-9\-]+/[A-Z]+/[IVX]+/[0-9]{4})"
         }
 
         self.header_phrases = {
@@ -27,6 +28,10 @@ class DocumentClassifier:
                 r"pemeriksaan\s+peninjauan\s+kembali",
                 r"memohon\s+pemeriksaan\s+peninjauan\s+kembali",
                 r"Terpidana\s+mengajukan\s+permohonan\s+peninjauan\s+kembali"
+            ],
+            "PUTUSAN_MILITER": [
+                r"Pengadilan\\s+Militer(?:\\s+Tinggi)?",
+                r"Nomor\\s*[:\\-]?\\s*\\d+\\-[A-Z]/PM"
             ]
         }
 

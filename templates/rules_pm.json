@@ -13,7 +13,7 @@
         "category": "what",
         "method": "regex",
         "patterns": [
-            "(Mahkamah\\s+Agung(?:\\s+Republik\\s+Indonesia)?)"
+            "(Pengadilan\\s+Militer(?:\\s+Tinggi)?\\s+[IVX0-9\\-]+\\s+[A-Za-z]+)"
         ],
         "scope": "header"
     },
@@ -21,7 +21,7 @@
         "category": "what",
         "method": "regex",
         "patterns": [
-            "(?:dalam|pada)?\\s*(?:pemeriksaan\\s+)?tingkat\\s+(pertama|banding|kasasi|peninjauan\\s+kembali)"
+            "(?:dalam|pada)?\\s*(?:pemeriksaan\\s+)?tingkat\\s+(pertama|banding|kasasi)"
         ],
         "scope": "header"
     },
@@ -52,8 +52,7 @@
         "category": "where",
         "method": "regex",
         "patterns": [
-            "Pengadilan\\s+(Negeri|Tinggi)\\s+([A-Za-z\\s]+?)(?:\\s+Yang\\s+Mengadili|\\s+Nomor|\\s+tanggal|\\s+Kelas)",
-            "Pengadilan\\s+(Negeri|Tinggi)\\s+([A-Za-z\\s]+?)(?=\\s*\\n)"
+            "Pengadilan\\s+Militer(?:\\s+Tinggi)?\\s+[IVX0-9\\-]+\\s+([A-Za-z]+)"
         ],
         "scope": "header"
     },
@@ -141,7 +140,7 @@
         "method": "regex",
         "scope": "header",
         "patterns": [
-            "(Pengadilan\\s+Negeri\\s+[A-Za-z\\s]+?)(?:\\s+yang|\\s+Nomor|\\s+tanggal|\\s+Kelas)"
+            "(Pengadilan\\s+Militer\\s+[IVX0-9\\-]\\s+[A-Za-z\\s]+?)(?:\\s+yang|\\s+Nomor|\\s+tanggal|\\s+Kelas)"
         ]
     },
     "evidence_item_count": {
