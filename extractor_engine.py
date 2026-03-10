@@ -271,6 +271,24 @@ class BaseExtractor:
             month = months.get(month_name, "01")
             return f"{year}-{month}-{day}"
         return date_str
+    
+    def _apply_dynamic_anchor(self, text: str, start_pattern: str, end_pattern: str=None) -> str:
+        if not start_pattern:
+            return text
+        
+        start_match = re.search(start_pattern, text, re.IGNORECASE | re.DOTALL)
+        if not start_match:
+            return text
+        
+        start_idx = start_match.start()
+
+        if end_pattern:
+            end_match = re.search(end_pattern, text[start_idx:], re.IGNORECASE | re.DOTALL)
+            if end_match:
+                end_idx = start_idx + end_match.end()
+                return text[start_idx:end_idx].strip()
+            
+            return text[start_idx:].strip()
 
     def _call_llm_api(self, prompt: str) -> Optional[str]:
         try:
@@ -578,24 +596,6 @@ Kembalikan SATU objek JSON dengan field tepat seperti contoh struktur di bawah i
 
     def run_extraction(self):
         """Orkestrasi utama hybrid (regex dulu, lalu LLM batched per-scope)."""
-        self.log(f"\n🚀 Memulai ekstraksi dengan {len(self.rules)} aturan...")
-
-        # ======================================================================
-        # TAHAP BARU (KONSEPTUAL): Pra-pemrosesan dengan IndoBERT/NER
-        # ======================================================================
-        # Di sini Anda bisa menjalankan model NER (seperti IndoBERT) sekali pada
-        # seluruh teks untuk mengekstrak entitas umum seperti nama orang,
-        # organisasi, dan lokasi.
-        #
-        # if hasattr(self, 'ner_model'):
-        #     self.log("\n   🔬 Menjalankan pra-ekstraksi entitas dengan NER...")
-        #     ner_results = self.ner_model.extract_entities(self.text)
-        #     # Contoh: Jika NER menemukan nama hakim dengan confidence tinggi
-        #     if 'judges' in ner_results and ner_results['judges']['confidence'] > 0.9:
-        #         self._add_field('who', 'judges', ner_results['judges']['value'],
-        #                         confidence=ner_results['judges']['confidence'], source='ner')
-        #         # Hapus 'judges' dari daftar yang akan diproses LLM untuk efisiensi
-        #         self.rules.pop('judges', None)
 
         # 1) Jalankan field berbasis regex
         for field_name, rule in self.rules.items():
@@ -616,33 +616,48 @@ Kembalikan SATU objek JSON dengan field tepat seperti contoh struktur di bawah i
             self._add_field(category, field_name, val, confidence=conf, source="regex")
             self.log(f"   ✅ [REGEX] {field_name}: {val} (conf={conf:.2f})")
 
-        # 2) Kelompokkan semua field LLM per scope dan panggil model secara batched
-        llm_by_scope: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+        llm_by_group: Dict[Tuple[str, str, str], List[Dict[str, Any]]] = defaultdict(list)
+
         for field_name, rule in self.rules.items():
             if rule.get("method") != "llm":
                 continue
-            # Jika ada whitelist field LLM, hanya proses yang termasuk
+
             if self.llm_fields is not None and field_name not in self.llm_fields:
                 continue
+
             target_scope = rule.get("scope", "full")
-            llm_by_scope[target_scope].append(
+            anchor_start = rule.get("anchor_start", "")
+            anchor_end = rule.get("anchor_end", "")
+
+            group_key = (target_scope, anchor_start, anchor_end)
+            llm_by_group[group_key].append(
                 {
                     "name": field_name,
                     "type": rule.get("type", "string"),
                     "description": rule.get("description", ""),
                     "category": rule.get("category", "what"),
-                    "ouput_format": rule.get("output_format", "text")
+                    "output_format": rule.get("output_format", "text"),
+                    "anchor_start": anchor_start,
+                    "anchor_end": anchor_end
                 }
             )
 
-        for scope_name, fields_spec in llm_by_scope.items():
-            text_to_process = self.sections.get(scope_name, self.text)
+        for (scope_name, anchor_start, anchor_end), fields_spec in llm_by_group.items():
+            base_text = self.sections.get(scope_name, self.text)
+            text_to_process = self._apply_dynamic_anchor(base_text, anchor_start, anchor_end)
+
+            anchor_log = f" | Anchor: '{anchor_start[:20]}...'" if anchor_start else ""
             self.log(
-                f"\n   🔍 Menjalankan LLM batch untuk scope '{scope_name}' ({len(fields_spec)} field)..."
+                f"\n Menjalankan LLM batch untuk scope '{scope_name}'{anchor_log} ({len(fields_spec)} field)..."
             )
 
             llm_input_spec = [
-                {"name": f["name"], "type": f["type"], "description": f["description"], "ouput_format": f.get("output_format", "text")}
+                {
+                    "name": f["name"],
+                    "type": f["type"],
+                    "description": f["description"],
+                    "output_format": f.get("output_format", "text")
+                }
                 for f in fields_spec
             ]
 
@@ -656,12 +671,12 @@ Kembalikan SATU objek JSON dengan field tepat seperti contoh struktur di bawah i
                 fname = field["name"]
                 category = field["category"]
                 if fname not in batch_results:
-                    self.log(f"   ❌ [LLM] {fname}: Tidak ada di respons JSON")
+                    self.log(f" [LLM] {fname}: Tidak ada di respon JSON")
                     continue
 
                 val, conf = batch_results[fname]
                 val = self._cleanup_value(fname, val)
                 self._add_field(category, fname, val, confidence=conf, source="llm")
-                self.log(f"   ✅ [LLM] {fname}: {val} (conf={conf:.2f})")
+                self.log(f" [LLM] {fname}: {val} (conf={conf:.2f})")
 
         return self.data
