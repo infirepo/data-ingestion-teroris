@@ -169,6 +169,7 @@ def main():
                 "radicalization_sources",
                 "activity_locations",
                 "crime_time_range",
+                "crime_location",
                 "reasoning_evidence",
                 "reasoning_appeal",
                 "motivation_factors",

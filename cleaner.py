@@ -307,10 +307,11 @@ class PDFCleaner:
         try:
             doc = fitz.open(pdf_path)
             text = ""
-            for page in doc:
+            for page_num, page in enumerate(doc):
                 blocks = page.get_text("blocks")
                 blocks.sort(key=lambda b: (b[1], b[0]))
                 page_text = "\n".join([b[4] for b in blocks if b[4].strip()])
+                text += f"\n\n--- [HALAMAN {page_num + 1}] ---\n\n"
                 text += page_text + "\n"
             doc.close()
 

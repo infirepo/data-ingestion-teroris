@@ -72,10 +72,9 @@
         "category": "where",
         "method": "regex",
         "patterns": [
-            "ditahan\\s+di\\s+(Rutan|Lapas|Rumah\\s+Tahanan\\s+Negara[\\w\\s]+)(?:\\s+oleh|;)",
-            "ditahan\\s+dalam\\s+tahanan\\s+(Rumah\\s+tahanan\\s+Negara)"
+            "ditahan\\s+(?:di|dalam|pada)\\s+(?:tahanan\\s+)?(Rutan|Lapas|Rumah\\s+Tahanan(?:\\s+Negara)?.*?)(?=\\s+sejak|\\s+dari|\\s+oleh|\\s+selama|;|\\.|\\d)"
         ],
-        "scope": "penahanan"
+        "scope": "header"
     },
     "witness_count": {
         "category": "how_many",
@@ -136,8 +135,9 @@
         "method": "regex",
         "scope": "footer",
         "patterns": [
-            "Diputuskan\\s+dalam\\s+sidang\\s+permusyawaratan.*?[,\\s]+tanggal\\s+([0-9]{1,2}\\s+[a-zA-Z]+\\s+[0-9]{4})",
-            "Ditetapkan\\s+di\\s+[a-zA-Z\\s]+[,]\\s+pada\\s+tanggal\\s+([0-9]{1,2}\\s+[a-zA-Z]+\\s+[0-9]{4})"
+            "(?:Diputuskan|Ditetapkan)[^.]*?permusyawaratan[^.]*?tanggal\\s+([0-9]{1,2}\\s+[a-zA-Z]+\\s+[0-9]{4})",
+            "Demikian(?:lah)?\\s+diputuskan[^.]*?tanggal\\s*[:\\s]*([0-9]{1,2}\\s+[a-zA-Z]+\\s+[0-9]{4})",
+            "pada\\s+hari[^.]*?tanggal\\s+([0-9]{1,2}\\s+[a-zA-Z]+\\s+[0-9]{4})"
         ]
     },
     "district_court": {
@@ -219,7 +219,7 @@
         "method": "llm",
         "scope": "dynamic",
         "type": "string",
-        "description": "Lokasi nama kelompok tersebut berada di provinsi mana atau wilayah mana.",
+        "description": "Sebutkan HANYA SATU lokasi spesifik (provinsi, kota, atau wilayah) tempat terdakwa bergabung dengan kelompok tersebut. Wajib sertakan nomor halaman dengan melihat penanda '--- [HALAMAN X] ---' pada teks. Contoh format jawaban: 'Jawa Barat (Halaman 15)'.",
         "anchor_start": "Menimbang,\\s*bahwa.*?(?:fakta-fakta\\s*hukum|diperoleh\\s*fakta\\s*bahwa|fakta\\s*yang\\s*terungkap\\s*dipersidangan)",
         "anchor_end": "Menimbang,\\s*bahwa\\s*selanjutnya\\s*(?:Majelis|Majelis\\s*Hakim)\\s*akan\\s*mempertimbangkan"
     },
@@ -281,6 +281,15 @@
         "anchor_start": "Menimbang,\\s*bahwa.*?(?:fakta-fakta\\s*hukum|diperoleh\\s*fakta\\s*bahwa|fakta\\s*yang\\s*terungkap\\s*dipersidangan)",
         "anchor_end": "Menimbang,\\s*bahwa\\s*selanjutnya\\s*(?:Majelis|Majelis\\s*Hakim)\\s*akan\\s*mempertimbangkan"
     },
+    "crime_location": {
+        "category": "where",
+        "method": "llm",
+        "scope": "dynamic",
+        "type": "string",
+        "description": "Sebutkan HANYA SATU lokasi pasti/spesifik tempat aksi terorisme (seperti penyerangan atau pengeboman) itu terjadi. Jika aksi terorisme belum terjadi (misalnya hanya sebatas perencanaan, pendanaan, atau persiapan), maka kembalikan nilai: 'Belum terjadi'. Contoh: 'Jalan MH Thamrin, Jakarta",
+        "anchor_start": "Menimbang,\\s*bahwa.*?(?:fakta-fakta\\s*hukum|diperoleh\\s*fakta\\s*bahwa|fakta\\s*yang\\s*terungkap\\s*dipersidangan)",
+        "anchor_end": "Menimbang,\\s*bahwa\\s*selanjutnya\\s*(?:Majelis|Majelis\\s*Hakim)\\s*akan\\s*mempertimbangkan"
+    },
     "reasoning_evidence": {
         "category": "why",
         "method": "llm",
@@ -335,9 +344,12 @@
     "detention_timeline": {
         "category": "when",
         "method": "llm",
-        "scope": "penahanan",
-        "type": "string",
-        "description": "Riwayat penahanan (Penyidik/PU/Hakim) dengan tanggal mulai-selesai."
+        "scope": "dynamic",
+        "type": "array",
+        "output_format": "json",
+        "anchor_start": "Terdakwa\\s+(?:telah\\s+)?(?:ditahan|berada\\s+dalam\\s+tahanan)",
+        "anchor_end": "(?:Terdakwa\\s+didampingi|Majelis\\s+Hakim\\s+telah\\s+membaca|Pengadilan\\s+Negeri\\s+tersebut|Menimbang,\\s+bahwa\\s+Terdakwa\\s+diajukan)",
+        "description": "Ekstrak riwayat penahanan terdakwa (mulai dari tingkat Penyidik, Penuntut Umum, hingga Hakim). Kembalikan dalam format JSON Array. Setiap objek memiliki key: 'date' (contoh: '2 Juli 2018 s/d 29 Oktober 2018') dan 'description' (contoh: 'Ditahan oleh Penyidik Densus di Rutan')."
     },
     "appeal_timeline": {
         "category": "when",
@@ -381,7 +393,7 @@
         "scope": "dynamic",
         "type": "array",
         "output_format": "json",
-        "anchor_start": "(?:untuk\\s*membuktikan\\s*dakwaannya[^.]*?mengajukan\\s*saksi|telah\\s*didengar\\s*keterangan\\s*Saksi)",
+        "anchor_start": "(?:untuk\\s*membuktikan\\s*dakwaannya[^.]*?(?:mengajukan|menghadirkan)\\s*saksi|telah\\s*didengar\\s*keterangan\\s*Saksi)",
         "anchor_end": "(?:keterangan\\s*Ahli|Terdakwa\\s*di\\s*persidangan\\s*telah\\s*memberikan\\s*keterangan|kini\\s*tibalah\\s*gilirannya)",
         "description": "Ekstrak nama saksi-saksi yang dihadirkan di persidangan. Kembalikan HANYA dalam format JSON Array. Contoh: [\"UTOM BUSRONI\", \"Agus\"]"
     },
