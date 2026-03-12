@@ -56,8 +56,8 @@
         "category": "where",
         "method": "regex",
         "patterns": [
-            "Pengadilan\\s+(Negeri|Tinggi)\\s+([A-Za-z\\s]+?)(?:\\s+Yang\\s+Mengadili|\\s+Nomor|\\s+tanggal|\\s+Kelas)",
-            "Pengadilan\\s+(Negeri|Tinggi)\\s+([A-Za-z\\s]+?)(?=\\s*\\n)"
+            "Mahkamah\\s+Agung\\s+(Republik\\s+Indonesia)",
+            "(Mahkamah\\s+Agung)(?:,?\\s+yang\\s+memeriksa|(?=\\s*\\n))"
         ],
         "scope": "header"
     },
@@ -163,7 +163,7 @@
         "output_format": "text",
         "anchor_start": "Majelis\\s*Hakim\\s*akan\\s*mempertimbangkan(?:\\s*apakah|\\s*dakwaan)",
         "anchor_end": "unsur(?:\\s*|-)*unsur(?:nya)?\\s*(?:sebagai\\s*berikut|adalah)|Ad\\.\\s*(?:1|satu|pertama)|Unsur\\s*(?:ke-?|)(?:satu|1|pertama)",
-        "description": "Identifikasi bentuk/model surat dakwaan (Tunggal, Alternatif, Subsidair, Kumulatif, Kombinasi). Cukup sebutkan jenisnya saja berdasarkan teks yang diberikan."
+        "description": "Identifikasi bentuk/model surat dakwaan (Tunggal, Alternatif, Subsidair, Kumulatif, Kombinasi). Jika tidak ada di contoh berikan jawaban 'Tidak Ada'."
     },
     "charged_articles": {
         "category": "what",
@@ -361,10 +361,12 @@
     "judges": {
         "category": "who",
         "method": "llm",
-        "scope": "footer",
+        "scope": "dynamic",
         "type": "array",
         "output_format": "json",
-        "description": "Nama Majelis Hakim (Hakim Ketua dan Anggota)."
+        "description": "Nama Majelis Hakim Tinggi (Hakim Ketua dan Anggota).",
+        "anchor_start": "Demikian\\s+diputus\\s+dalam\\s+(?:musyawarah|sidang\\+permusyawaratan)\\s+Majelis\\s+Hakim\\s+Pengadilan\\s+Tinggi",
+        "achor_end": "Panitera\\s+Pengganti\\s+(?:pada\\s+Pengadilan\\s+Tinggi)"
     },
     "clerk": {
         "category": "who",
@@ -409,7 +411,7 @@
         "method": "llm",
         "scope": "dynamic",
         "type": "string",
-        "description": "Di mana lokasi atau alamat terdakwa ditangkap oleh aparat? Sebutkan lokasinya secara ringkas (contoh: 'Rumah kontrakan di Jalan Mawar, Bekasi').",
+        "description": "Di mana lokasi atau alamat terdakwa ditangkap oleh aparat? Sebutkan lokasinya secara ringkas (contoh: 'Rumah kontrakan di Jalan Mawar, Bekasi'). Jika tidak ditemukan dikembalikan 'Tidak disebutkan'",
         "anchor_start": "(?:Perbuatan|ia\\s*terdakwa).*?(?:dengan\\s*cara|sebagai\\s*berikut)",
         "anchor_end": "Menimbang,\\s*bahwa\\s*(?:terhadap|atas)\\s*dakwaan|Menimbang,\\s*bahwa\\s*untuk\\s*membuktikan"
     },
@@ -425,9 +427,9 @@
         "method": "llm",
         "scope": "dynamic",
         "type": "string",
-        "description": "Apa inti dari Nota Pembelaan (Pledoi) yang diajukan oleh Terdakwa atau Penasihat Hukumnya? (contoh: 'Memohon hukuman seringan-ringannya karena terdakwa tulang punggung keluarga'). Rangkum dalam 1 kalimat pendek.",
-        "anchor_start": "(?:Perbuatan|ia\\s*terdakwa).*?(?:dengan\\s*cara|sebagai\\s*berikut)",
-        "anchor_end": "Menimbang,\\s*bahwa\\s*(?:terhadap|atas)\\s*dakwaan|Menimbang,\\s*bahwa\\s*untuk\\s*membuktikan"
+        "description": "Sebutkan inti dari memori banding yang diajukan oleh Terdakwa atau Penasihat Hukumnya? (contoh: 'Memohon hukuman seringan-ringannya karena terdakwa tulang punggung keluarga'). Rangkum menjadi lebih ringkas.",
+        "anchor_start": "Menimbang,\\s*bahwa\\s*Penasihat\\s*Hukum\\s*Terdakwa\\s*mengajukan\\s*memori\\s*banding",
+        "anchor_end": "Menimbang,\\s*bahwa\\s*setelah\\s*Majelis\\s*Hakim\\s*Pengadilan\\s*Tinggi"
     },
     "defendant_local_network_joined_at": {
         "category": "when",

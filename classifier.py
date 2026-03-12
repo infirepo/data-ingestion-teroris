@@ -3,11 +3,11 @@ import re
 class DocumentClassifier:
     def __init__(self):
         self.case_number_patterns = {
-            "PUTUSAN_PN": r"Nomor[:\s.]*\d+[\s/]*Pid[\.\s-]*Sus[\.\s-]*Teroris[\s/]*\d{4}[\s/]*PN",
-            "PUTUSAN_PT": r"Nomor[:\s.]*\d+[\s/]*Pid[\.\s-]*Sus[\s/]*\d{4}[\s/]*PT",
-            "PUTUSAN_KASASI": r"Nomor[:\s.]*\d+[\s/]*K[\s/]*Pid[\.\s-]*Sus[\s/]*\d{4}",
-            "PUTUSAN_PK": r"Nomor[:\s.]*\d+[\s/]*PK[\s/]*Pid[\.\s-]*Sus[\s/]*\d{4}",
-            "PUTUSAN_MILITER": r"Nomor\s*[:\-]?\s*([0-9]+-[A-Z]/PM\s*[A-Z0-9\-]+/[A-Z]+/[IVX]+/[0-9]{4})"
+            "PUTUSAN_PN": r"Nomor[:\s.]*[0-9Xx]+[\s/]*Pid[\.\s-]*Sus(?:[\.\s-]*Teroris)?[\s/]*[0-9Xx]{4}[\s/]*PN",
+            "PUTUSAN_PT": r"Nomor[:\s.]*[0-9Xx]+[\s/]*Pid[\.\s-]*Sus[\s/]*[0-9Xx]{4}[\s/]*PT",
+            "PUTUSAN_KASASI": r"Nomor[:\s.]*[0-9Xx]+[\s/]*K[\s/]*Pid[\.\s-]*Sus[\s/]*[0-9Xx]{4}",
+            "PUTUSAN_PK": r"Nomor[:\s.]*[0-9Xx]+[\s/]*PK[\s/]*Pid[\.\s-]*Sus[\s/]*[0-9Xx]{4}",
+            "PUTUSAN_MILITER": r"Nomor\s*[:\-]?\s*([0-9Xx]+-[A-Z]/PM\s*[A-Z0-9\-]+/[A-Z]+/[IVX]+/[0-9Xx]{4})"
         }
 
         self.header_phrases = {

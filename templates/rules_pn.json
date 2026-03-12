@@ -409,7 +409,7 @@
         "method": "llm",
         "scope": "dynamic",
         "type": "string",
-        "description": "Di mana lokasi atau alamat terdakwa ditangkap oleh aparat? Sebutkan lokasinya secara ringkas (contoh: 'Rumah kontrakan di Jalan Mawar, Bekasi').",
+        "description": "Di mana lokasi atau alamat terdakwa ditangkap oleh aparat? Sebutkan lokasinya secara ringkas (contoh: 'Rumah kontrakan di Jalan Mawar, Bekasi'). Jika tidak ditemukan dikembalikan 'Tidak disebutkan'.",
         "anchor_start": "Menimbang,\\s*bahwa.*?(?:fakta-fakta\\s*hukum|diperoleh\\s*fakta\\s*bahwa|fakta\\s*yang\\s*terungkap\\s*dipersidangan)",
         "anchor_end": "Menimbang,\\s*bahwa\\s*selanjutnya\\s*(?:Majelis|Majelis\\s*Hakim)\\s*akan\\s*mempertimbangkan"
     },
