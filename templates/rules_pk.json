@@ -3,8 +3,8 @@
         "category": "what",
         "method": "regex",
         "patterns": [
-            "(?:PUTUSAN|Nomor|No)\\s*[:\\.]?\\s*(\\d+[\\s\\w\\.]*/[\\s\\w\\.\\-/]+)",
-            "(?:Perkara|Nomor)\\s*[:\\.]?\\s*(\\d+[\\d\\s\\w\\.\\-/]{10,80})"
+            "(?:PUTUSAN|Nomor|No)\\s*[:\\.]?\\s*([0-9Xx]+[\\s\\w\\.]*/[\\s\\w\\.\\-/Xx]+)",
+            "(?:Perkara|Nomor)\\s*[:\\.]?\\s*([0-9Xx]+[\\d\\s\\w\\.\\-/Xx]{10,80})"
         ],
         "stop_words": ["DEMI", "PENGADILAN", "MENGADILI", "Telah", "Berdasarkan"],
         "scope": "header"
