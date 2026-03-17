@@ -13,7 +13,7 @@
         "category": "what",
         "method": "regex",
         "patterns": [
-            "(Mahkamah\\s+Agung(?:\\s+Republik\\s+Indonesia)?)"
+            "(Pengadilan\\s+(Tinggi|Negeri)\\s+[A-Za-z\\s]+?)(?:\\s+yang|\\s+Nomor|\\s+tanggal|\\s+Kelas)"
         ],
         "scope": "header"
     },
@@ -21,7 +21,7 @@
         "category": "what",
         "method": "regex",
         "patterns": [
-            "(?:dalam|pada)?\\s*(?:pemeriksaan\\s+)?tingkat\\s+(pertama|banding|kasasi|peninjauan\\s+kembali)"
+            "(?:dalam|pada)?\\s*(?:pemeriksaan\\s+)?tingkat\\s+(pertama|banding|kasasi)"
         ],
         "scope": "header"
     },
@@ -211,17 +211,17 @@
         "scope": "dynamic",
         "type": "string",
         "description": "Sebutkan hanya nama kelompok/jaringan (JAD, JI, ISIS, MIT, Al-Qaedah, ISIL, dan sebagainya). Atau 'Tidak Diketahui' jika tidak ada. Jangan tampilkan hasi kosong",
-        "anchor_start": "(?i)(?:Perbuatan\\s+tersebut\\s+dilakukan(?:.*?)\\s*dengan\\s+cara-cara|Bahwa\\s+hal-ikhwal\\s+keikutsertaan\\s+(?:para\\s+)?Terdakwa\\s+dalam|Menimbang[\\s,]*bahwa\\s+terhadap\\s+alasan\\s+peninjauan\\s+kembali\\s+yang\\s+d[ia]+jukan)",
-        "anchor_end": "(?i)(?:Perbuatan\\s+(?:Mereka\\s+)?Terdakwa\\s+sebagaimana\\s+diatur\\s+dan\\s+diancam|Menimbang[\\s,]*bahwa\\s+berdasarkan\\s+pertimbangan\\s+hukum\\s+di\\s*atas|Menimbang[\\s,]*bahwa\\s*(?:terhadap|atas)\\s*dakwaan|Menimbang[\\s,]*bahwa\\s*untuk\\s*membuktikan)"
+        "anchor_start": "Menimbang,\\s*bahwa.*?(?:fakta-fakta\\s*hukum|diperoleh\\s*fakta\\s*bahwa|fakta\\s*yang\\s*terungkap\\s*dipersidangan)",
+        "anchor_end": "Menimbang,\\s*bahwa\\s*selanjutnya\\s*(?:Majelis|Majelis\\s*Hakim)\\s*akan\\s*mempertimbangkan"
     },
     "defendant_local_network": {
         "category": "who",
         "method": "llm",
         "scope": "dynamic",
         "type": "string",
-        "description": "Sebutkann HANYA SATU lokasi spesifik (provinsi, kota, atau wilayah) tempat terdakwa bergabung dengan kelompok tersebut.",
-        "anchor_start": "(?i)(?:Perbuatan\\s+tersebut\\s+dilakukan(?:.*?)\\s*dengan\\s+cara-cara|Bahwa\\s+hal-ikhwal\\s+keikutsertaan\\s+(?:para\\s+)?Terdakwa\\s+dalam|Menimbang[\\s,]*bahwa\\s+terhadap\\s+alasan\\s+peninjauan\\s+kembali\\s+yang\\s+d[ia]+jukan)",
-        "anchor_end": "(?i)(?:Perbuatan\\s+(?:Mereka\\s+)?Terdakwa\\s+sebagaimana\\s+diatur\\s+dan\\s+diancam|Menimbang[\\s,]*bahwa\\s+berdasarkan\\s+pertimbangan\\s+hukum\\s+di\\s*atas|Menimbang[\\s,]*bahwa\\s*(?:terhadap|atas)\\s*dakwaan|Menimbang[\\s,]*bahwa\\s*untuk\\s*membuktikan)"
+        "description": "Lokasi nama kelompok tersebut berada di provinsi mana atau wilayah mana.",
+        "anchor_start": "Menimbang,\\s*bahwa.*?(?:fakta-fakta\\s*hukum|diperoleh\\s*fakta\\s*bahwa|fakta\\s*yang\\s*terungkap\\s*dipersidangan)",
+        "anchor_end": "Menimbang,\\s*bahwa\\s*selanjutnya\\s*(?:Majelis|Majelis\\s*Hakim)\\s*akan\\s*mempertimbangkan"
     },
     "has_attack_plan": {
         "category": "what",
@@ -229,8 +229,8 @@
         "scope": "dynamic",
         "type": "boolean",
         "description": "Apakah terdakwa terbukti memiliki rencana serangan? Jawab 'Ya' atau 'Tidak'.",
-        "anchor_start": "(?i)(?:Perbuatan\\s+tersebut\\s+dilakukan(?:.*?)\\s*dengan\\s+cara-cara|Bahwa\\s+hal-ikhwal\\s+keikutsertaan\\s+(?:para\\s+)?Terdakwa\\s+dalam|Menimbang[\\s,]*bahwa\\s+terhadap\\s+alasan\\s+peninjauan\\s+kembali\\s+yang\\s+d[ia]+jukan)",
-        "anchor_end": "(?i)(?:Perbuatan\\s+(?:Mereka\\s+)?Terdakwa\\s+sebagaimana\\s+diatur\\s+dan\\s+diancam|Menimbang[\\s,]*bahwa\\s+berdasarkan\\s+pertimbangan\\s+hukum\\s+di\\s*atas|Menimbang[\\s,]*bahwa\\s*(?:terhadap|atas)\\s*dakwaan|Menimbang[\\s,]*bahwa\\s*untuk\\s*membuktikan)"
+        "anchor_start": "Menimbang,\\s*bahwa.*?(?:fakta-fakta\\s*hukum|diperoleh\\s*fakta\\s*bahwa|fakta\\s*yang\\s*terungkap\\s*dipersidangan)",
+        "anchor_end": "Menimbang,\\s*bahwa\\s*selanjutnya\\s*(?:Majelis|Majelis\\s*Hakim)\\s*akan\\s*mempertimbangkan"
     },
     "attack_preparation_activities": {
         "category": "what",
@@ -239,8 +239,8 @@
         "type": "array",
         "output_format": "json",
         "description": "Daftar kegiatan persiapan aksi (latihan militer, merakit bom, survei target, kumpulkan dana).",
-        "anchor_start": "(?i)(?:Perbuatan\\s+tersebut\\s+dilakukan(?:.*?)\\s*dengan\\s+cara-cara|Bahwa\\s+hal-ikhwal\\s+keikutsertaan\\s+(?:para\\s+)?Terdakwa\\s+dalam|Menimbang[\\s,]*bahwa\\s+terhadap\\s+alasan\\s+peninjauan\\s+kembali\\s+yang\\s+d[ia]+jukan)",
-        "anchor_end": "(?i)(?:Perbuatan\\s+(?:Mereka\\s+)?Terdakwa\\s+sebagaimana\\s+diatur\\s+dan\\s+diancam|Menimbang[\\s,]*bahwa\\s+berdasarkan\\s+pertimbangan\\s+hukum\\s+di\\s*atas|Menimbang[\\s,]*bahwa\\s*(?:terhadap|atas)\\s*dakwaan|Menimbang[\\s,]*bahwa\\s*untuk\\s*membuktikan)"
+        "anchor_start": "Menimbang,\\s*bahwa.*?(?:fakta-fakta\\s*hukum|diperoleh\\s*fakta\\s*bahwa|fakta\\s*yang\\s*terungkap\\s*dipersidangan)",
+        "anchor_end": "Menimbang,\\s*bahwa\\s*selanjutnya\\s*(?:Majelis|Majelis\\s*Hakim)\\s*akan\\s*mempertimbangkan"
     },
     "attack_plan_summary": {
         "category": "what",
@@ -248,8 +248,8 @@
         "scope": "dynamic",
         "type": "string",
         "description": "Ringkas target dan metode serangan (bom bunuh diri, senjata tajam, dsb).",
-        "anchor_start": "(?i)(?:Perbuatan\\s+tersebut\\s+dilakukan(?:.*?)\\s*dengan\\s+cara-cara|Bahwa\\s+hal-ikhwal\\s+keikutsertaan\\s+(?:para\\s+)?Terdakwa\\s+dalam|Menimbang[\\s,]*bahwa\\s+terhadap\\s+alasan\\s+peninjauan\\s+kembali\\s+yang\\s+d[ia]+jukan)",
-        "anchor_end": "(?i)(?:Perbuatan\\s+(?:Mereka\\s+)?Terdakwa\\s+sebagaimana\\s+diatur\\s+dan\\s+diancam|Menimbang[\\s,]*bahwa\\s+berdasarkan\\s+pertimbangan\\s+hukum\\s+di\\s*atas|Menimbang[\\s,]*bahwa\\s*(?:terhadap|atas)\\s*dakwaan|Menimbang[\\s,]*bahwa\\s*untuk\\s*membuktikan)"
+        "anchor_start": "Menimbang,\\s*bahwa.*?(?:fakta-fakta\\s*hukum|diperoleh\\s*fakta\\s*bahwa|fakta\\s*yang\\s*terungkap\\s*dipersidangan)",
+        "anchor_end": "Menimbang,\\s*bahwa\\s*selanjutnya\\s*(?:Majelis|Majelis\\s*Hakim)\\s*akan\\s*mempertimbangkan"
     },
     "radicalization_sources": {
         "category": "why",
@@ -258,8 +258,8 @@
         "type": "array",
         "output_format": "json",
         "description": "Sumber terpapar paham radikal (kajian ustaz, grup Telegram, Facebook, buku, pengaruh keluarga).",
-        "anchor_start": "(?i)(?:Perbuatan\\s+tersebut\\s+dilakukan(?:.*?)\\s*dengan\\s+cara-cara|Bahwa\\s+hal-ikhwal\\s+keikutsertaan\\s+(?:para\\s+)?Terdakwa\\s+dalam|Menimbang[\\s,]*bahwa\\s+terhadap\\s+alasan\\s+peninjauan\\s+kembali\\s+yang\\s+d[ia]+jukan)",
-        "anchor_end": "(?i)(?:Perbuatan\\s+(?:Mereka\\s+)?Terdakwa\\s+sebagaimana\\s+diatur\\s+dan\\s+diancam|Menimbang[\\s,]*bahwa\\s+berdasarkan\\s+pertimbangan\\s+hukum\\s+di\\s*atas|Menimbang[\\s,]*bahwa\\s*(?:terhadap|atas)\\s*dakwaan|Menimbang[\\s,]*bahwa\\s*untuk\\s*membuktikan)"
+        "anchor_start": "Menimbang,\\s*bahwa.*?(?:fakta-fakta\\s*hukum|diperoleh\\s*fakta\\s*bahwa|fakta\\s*yang\\s*terungkap\\s*dipersidangan)",
+        "anchor_end": "Menimbang,\\s*bahwa\\s*selanjutnya\\s*(?:Majelis|Majelis\\s*Hakim)\\s*akan\\s*mempertimbangkan"
     },
     "activity_locations": {
         "category": "where",
@@ -268,8 +268,8 @@
         "type": "array",
         "output_format": "json",
         "description": "Lokasi aktivitas (kajian rahasia, baiat, latihan fisik). Nama daerah/gunung jika ada.",
-        "anchor_start": "(?i)(?:Perbuatan\\s+tersebut\\s+dilakukan(?:.*?)\\s*dengan\\s+cara-cara|Bahwa\\s+hal-ikhwal\\s+keikutsertaan\\s+(?:para\\s+)?Terdakwa\\s+dalam|Menimbang[\\s,]*bahwa\\s+terhadap\\s+alasan\\s+peninjauan\\s+kembali\\s+yang\\s+d[ia]+jukan)",
-        "anchor_end": "(?i)(?:Perbuatan\\s+(?:Mereka\\s+)?Terdakwa\\s+sebagaimana\\s+diatur\\s+dan\\s+diancam|Menimbang[\\s,]*bahwa\\s+berdasarkan\\s+pertimbangan\\s+hukum\\s+di\\s*atas|Menimbang[\\s,]*bahwa\\s*(?:terhadap|atas)\\s*dakwaan|Menimbang[\\s,]*bahwa\\s*untuk\\s*membuktikan)"
+        "anchor_start": "Menimbang,\\s*bahwa.*?(?:fakta-fakta\\s*hukum|diperoleh\\s*fakta\\s*bahwa|fakta\\s*yang\\s*terungkap\\s*dipersidangan)",
+        "anchor_end": "Menimbang,\\s*bahwa\\s*selanjutnya\\s*(?:Majelis|Majelis\\s*Hakim)\\s*akan\\s*mempertimbangkan"
     },
     "crime_time_range": {
         "category": "when",
@@ -277,18 +277,9 @@
         "scope": "dynamic",
         "type": "array",
         "output_format": "json",
-        "description": "Ekstrak kronologi kejadian tindak pidana menjadi daftar timeline dari seluruh rangkaian dakwaan yang ada (JANGAN ada yang terlewat). Kembalikan HANYA dalam format JSON Array. Setiap objek WAJIB memiliki key: 'date' dan 'description' (tindakan terdakwa/saksi/kelompok).",
-        "anchor_start": "(?i)(?:Perbuatan\\s+tersebut\\s+dilakukan(?:.*?)\\s*dengan\\s+cara-cara|Bahwa\\s+hal-ikhwal\\s+keikutsertaan\\s+(?:para\\s+)?Terdakwa\\s+dalam|Menimbang[\\s,]*bahwa\\s+terhadap\\s+alasan\\s+peninjauan\\s+kembali\\s+yang\\s+d[ia]+jukan)",
-        "anchor_end": "(?i)(?:Perbuatan\\s+(?:Mereka\\s+)?Terdakwa\\s+sebagaimana\\s+diatur\\s+dan\\s+diancam|Menimbang[\\s,]*bahwa\\s+berdasarkan\\s+pertimbangan\\s+hukum\\s+di\\s*atas|Menimbang[\\s,]*bahwa\\s*(?:terhadap|atas)\\s*dakwaan|Menimbang[\\s,]*bahwa\\s*untuk\\s*membuktikan)"
-    },
-    "crime_location": {
-        "category": "where",
-        "method": "llm",
-        "scope": "dynamic",
-        "type": "string",
-        "description": "Sebutkan HANYA SATU lokasi pasti/spesifik tempat aksi terorisme (seperti penyerangan atau pengeboman) itu terjadi. Jika aksi terorisme belum terjadi (misalnya hanya sebatas perencanaan, pendanaan, atau persiapan), maka kembalikan nilai: 'Belum terjadi'. Contoh: 'Jalan MH Thamrin, Jakarta",
-        "anchor_start": "(?i)(?:Perbuatan\\s+tersebut\\s+dilakukan(?:.*?)\\s*dengan\\s+cara-cara|Bahwa\\s+hal-ikhwal\\s+keikutsertaan\\s+(?:para\\s+)?Terdakwa\\s+dalam|Menimbang[\\s,]*bahwa\\s+terhadap\\s+alasan\\s+peninjauan\\s+kembali\\s+yang\\s+d[ia]+jukan)",
-        "anchor_end": "(?i)(?:Perbuatan\\s+(?:Mereka\\s+)?Terdakwa\\s+sebagaimana\\s+diatur\\s+dan\\s+diancam|Menimbang[\\s,]*bahwa\\s+berdasarkan\\s+pertimbangan\\s+hukum\\s+di\\s*atas|Menimbang[\\s,]*bahwa\\s*(?:terhadap|atas)\\s*dakwaan|Menimbang[\\s,]*bahwa\\s*untuk\\s*membuktikan)"
+        "description": "Ekstrak kronologi kejadian tindak pidana menjadi daftar timeline. Kembalikan HANYA dalam format JSON Array. Setiap objek di dalam array WAJIB memiliki key: 'date' (string, tanggal/bulan/tahun kejadian) dan 'description' (string, deskripsi tindakan yang dilakukan terdakwa pada waktu tersebut).",
+        "anchor_start": "Menimbang,\\s*bahwa.*?(?:fakta-fakta\\s*hukum|diperoleh\\s*fakta\\s*bahwa|fakta\\s*yang\\s*terungkap\\s*dipersidangan)",
+        "anchor_end": "Menimbang,\\s*bahwa\\s*selanjutnya\\s*(?:Majelis|Majelis\\s*Hakim)\\s*akan\\s*mempertimbangkan"
     },
     "reasoning_evidence": {
         "category": "why",
@@ -311,8 +302,8 @@
         "type": "array",
         "output_format": "json",
         "description": "Motivasi pribadi (ingin mati syahid, balas dendam, ikut-ikutan).",
-        "anchor_start": "(?i)(?:Perbuatan\\s+tersebut\\s+dilakukan(?:.*?)\\s*dengan\\s+cara-cara|Bahwa\\s+hal-ikhwal\\s+keikutsertaan\\s+(?:para\\s+)?Terdakwa\\s+dalam|Menimbang[\\s,]*bahwa\\s+terhadap\\s+alasan\\s+peninjauan\\s+kembali\\s+yang\\s+d[ia]+jukan)",
-        "anchor_end": "(?i)(?:Perbuatan\\s+(?:Mereka\\s+)?Terdakwa\\s+sebagaimana\\s+diatur\\s+dan\\s+diancam|Menimbang[\\s,]*bahwa\\s+berdasarkan\\s+pertimbangan\\s+hukum\\s+di\\s*atas|Menimbang[\\s,]*bahwa\\s*(?:terhadap|atas)\\s*dakwaan|Menimbang[\\s,]*bahwa\\s*untuk\\s*membuktikan)"
+        "anchor_start": "Menimbang,\\s*bahwa.*?(?:fakta-fakta\\s*hukum|diperoleh\\s*fakta\\s*bahwa|fakta\\s*yang\\s*terungkap\\s*dipersidangan)",
+        "anchor_end": "Menimbang,\\s*bahwa\\s*selanjutnya\\s*(?:Majelis|Majelis\\s*Hakim)\\s*akan\\s*mempertimbangkan"
     },
     "evidence_items": {
         "category": "what",
@@ -393,9 +384,9 @@
         "scope": "dynamic",
         "type": "array",
         "output_format": "json",
-        "description": "Ekstrak nama saksi-saksi yang dihadirkan di persidangan. Kembalikan HANYA dalam format JSON Array. Contoh: [\"UTOM BUSRONI\", \"Agus\"]",
-        "anchor_start": "(?i)(?:Perbuatan\\s+tersebut\\s+dilakukan(?:.*?)\\s*dengan\\s+cara-cara|Bahwa\\s+hal-ikhwal\\s+keikutsertaan\\s+(?:para\\s+)?Terdakwa\\s+dalam|Menimbang[\\s,]*bahwa\\s+terhadap\\s+alasan\\s+peninjauan\\s+kembali\\s+yang\\s+d[ia]+jukan)",
-        "anchor_end": "(?i)(?:Perbuatan\\s+(?:Mereka\\s+)?Terdakwa\\s+sebagaimana\\s+diatur\\s+dan\\s+diancam|Menimbang[\\s,]*bahwa\\s+berdasarkan\\s+pertimbangan\\s+hukum\\s+di\\s*atas|Menimbang[\\s,]*bahwa\\s*(?:terhadap|atas)\\s*dakwaan|Menimbang[\\s,]*bahwa\\s*untuk\\s*membuktikan)"
+        "anchor_start": "(?:untuk\\s*membuktikan\\s*dakwaannya[^.]*?mengajukan\\s*saksi|telah\\s*didengar\\s*keterangan\\s*Saksi)",
+        "anchor_end": "(?:keterangan\\s*Ahli|Terdakwa\\s*di\\s*persidangan\\s*telah\\s*memberikan\\s*keterangan|kini\\s*tibalah\\s*gilirannya)",
+        "description": "Ekstrak nama saksi-saksi yang dihadirkan di persidangan. Kembalikan HANYA dalam format JSON Array. Contoh: [\"UTOM BUSRONI\", \"Agus\"]"
     },
     "arrest_date": {
         "category": "when",
@@ -409,9 +400,9 @@
         "method": "llm",
         "scope": "dynamic",
         "type": "string",
-        "description": "Di mana lokasi atau alamat terdakwa ditangkap oleh aparat? Sebutkan lokasinya secara ringkas (contoh: 'Rumah kontrakan di Jalan Mawar, Bekasi'). Jika tidak ditemukan dikembalikan 'Tidak disebutkan'",
-        "anchor_start": "(?i)(?:Perbuatan\\s+tersebut\\s+dilakukan(?:.*?)\\s*dengan\\s+cara-cara|Bahwa\\s+hal-ikhwal\\s+keikutsertaan\\s+(?:para\\s+)?Terdakwa\\s+dalam|Menimbang[\\s,]*bahwa\\s+terhadap\\s+alasan\\s+peninjauan\\s+kembali\\s+yang\\s+d[ia]+jukan)",
-        "anchor_end": "(?i)(?:Perbuatan\\s+(?:Mereka\\s+)?Terdakwa\\s+sebagaimana\\s+diatur\\s+dan\\s+diancam|Menimbang[\\s,]*bahwa\\s+berdasarkan\\s+pertimbangan\\s+hukum\\s+di\\s*atas|Menimbang[\\s,]*bahwa\\s*(?:terhadap|atas)\\s*dakwaan|Menimbang[\\s,]*bahwa\\s*untuk\\s*membuktikan)"
+        "description": "Di mana lokasi atau alamat terdakwa ditangkap oleh aparat? Sebutkan lokasinya secara ringkas (contoh: 'Rumah kontrakan di Jalan Mawar, Bekasi').",
+        "anchor_start": "Menimbang,\\s*bahwa.*?(?:fakta-fakta\\s*hukum|diperoleh\\s*fakta\\s*bahwa|fakta\\s*yang\\s*terungkap\\s*dipersidangan)",
+        "anchor_end": "Menimbang,\\s*bahwa\\s*selanjutnya\\s*(?:Majelis|Majelis\\s*Hakim)\\s*akan\\s*mempertimbangkan"
     },
     "investigators": {
         "category": "who",
@@ -425,9 +416,9 @@
         "method": "llm",
         "scope": "dynamic",
         "type": "string",
-        "description": "Sebutkan inti dari memori peninjauan kembali yang diajukan oleh Terpidana? (contoh: 'putusan itu dengan jelas memperlihatkan suatu kekhilafan Hakim atau suatu kekeliruan yang nyata'). Rangkum secara ringkas.",
-        "anchor_start": "(?i)Menimbang[\\s,]*bahwa\\s*(?:alasan-alasan|alasan)\\s*(?:peninjauan\\s*kembali|PK)\\s*yang\\s*d[ia]+jukan",
-        "anchor_end": "(?i)Menimbang[\\s,]*bahwa\\s*(?:terhadap\\s*alasan(?:-alasan)?|oleh\\s*karena\\s*permohonan\\s*peninjauan\\s*kembali|atas\\s*alasan(?:-alasan)?\\s*tersebut)"
+        "description": "Apa inti dari Nota Pembelaan (Pledoi) yang diajukan oleh Terdakwa atau Penasihat Hukumnya? (contoh: 'Memohon hukuman seringan-ringannya karena terdakwa tulang punggung keluarga'). Rangkum dalam 1 kalimat pendek.",
+        "anchor_start": "Menimbang,\\s*bahwa\\s*(?:terhadap|atas)\\s*(?:tuntutan|pidana).*?(?:mengajukan)?\\s*pembelaan",
+        "anchor_end": "Menimbang,\\s*bahwa.*?(?:Replik|Duplik|fakta-fakta\\s*hukum)"
     },
     "defendant_local_network_joined_at": {
         "category": "when",
@@ -435,8 +426,8 @@
         "scope": "dynamic",
         "type": "string",
         "description": "Kapan terdakwa pertama kali bergabung, berbaiat, atau mulai aktif dalam jaringan/kelompok teror lokal tersebut? (contoh: 'Awal tahun 2016' atau 'Agustus 2018'). Jika tidak disebutkan jelas, jawab 'Tidak disebutkan'.",
-        "anchor_start": "(?i)(?:Perbuatan\\s+tersebut\\s+dilakukan(?:.*?)\\s*dengan\\s+cara-cara|Bahwa\\s+hal-ikhwal\\s+keikutsertaan\\s+(?:para\\s+)?Terdakwa\\s+dalam|Menimbang[\\s,]*bahwa\\s+terhadap\\s+alasan\\s+peninjauan\\s+kembali\\s+yang\\s+d[ia]+jukan)",
-        "anchor_end": "(?i)(?:Perbuatan\\s+(?:Mereka\\s+)?Terdakwa\\s+sebagaimana\\s+diatur\\s+dan\\s+diancam|Menimbang[\\s,]*bahwa\\s+berdasarkan\\s+pertimbangan\\s+hukum\\s+di\\s*atas|Menimbang[\\s,]*bahwa\\s*(?:terhadap|atas)\\s*dakwaan|Menimbang[\\s,]*bahwa\\s*untuk\\s*membuktikan)"
+        "anchor_start": "Menimbang,\\s*bahwa.*?(?:fakta-fakta\\s*hukum|diperoleh\\s*fakta\\s*bahwa|fakta\\s*yang\\s*terungkap\\s*dipersidangan)",
+        "anchor_end": "Menimbang,\\s*bahwa\\s*selanjutnya\\s*(?:Majelis|Majelis\\s*Hakim)\\s*akan\\s*mempertimbangkan"
     },
     "injury_severity": {
         "category": "how_much",
@@ -444,9 +435,9 @@
         "scope": "dynamic",
         "type": "string",
         "output_format": "text",
-        "description": "Cari informasi mengenai ada atau tidaknya korban. Jika tindak pidana ini murni tahap persiapan/pemufakatan jahat dan BELUM ada serangan, atau di dalam teks tidak disebutkan adanya korban, kamu WAJIB menjawab dengan persis kalimat: 'Tidak ada korban'. Jika ada serangan, sebutkan keparahannya (contoh: 'Korban meninggal dunia', 'Luka berat'). Jangan biarkan kosong!",
-        "anchor_start": "(?i)(?:Perbuatan\\s+tersebut\\s+dilakukan(?:.*?)\\s*dengan\\s+cara-cara|Bahwa\\s+hal-ikhwal\\s+keikutsertaan\\s+(?:para\\s+)?Terdakwa\\s+dalam|Menimbang[\\s,]*bahwa\\s+terhadap\\s+alasan\\s+peninjauan\\s+kembali\\s+yang\\s+d[ia]+jukan)",
-        "anchor_end": "(?i)(?:Perbuatan\\s+(?:Mereka\\s+)?Terdakwa\\s+sebagaimana\\s+diatur\\s+dan\\s+diancam|Menimbang[\\s,]*bahwa\\s+berdasarkan\\s+pertimbangan\\s+hukum\\s+di\\s*atas|Menimbang[\\s,]*bahwa\\s*(?:terhadap|atas)\\s*dakwaan|Menimbang[\\s,]*bahwa\\s*untuk\\s*membuktikan)"
+        "anchor_start": "Menimbang,\\s*bahwa.*?(?:fakta-fakta\\s*hukum|diperoleh\\s*fakta\\s*bahwa|fakta\\s*yang\\s*terungkap\\s*dipersidangan)",
+        "anchor_end": "Menimbang,\\s*bahwa\\s*selanjutnya\\s*(?:Majelis|Majelis\\s*Hakim)\\s*akan\\s*mempertimbangkan",
+        "description": "Cari informasi mengenai ada atau tidaknya korban. Jika tindak pidana ini murni tahap persiapan/pemufakatan jahat dan BELUM ada serangan, atau di dalam teks tidak disebutkan adanya korban, kamu WAJIB menjawab dengan persis kalimat: 'Tidak ada korban'. Jika ada serangan, sebutkan keparahannya (contoh: 'Korban meninggal dunia', 'Luka berat'). Jangan biarkan kosong!"
     },
     "related_entities": {
         "category": "who",
@@ -455,8 +446,8 @@
         "type": "array",
         "output_format": "json",
         "description": "Daftarkan nama kelompok, organisasi, atau jaringan terorisme yang terafiliasi dengan terdakwa (contoh: 'JAD', 'JI', 'MIT', 'ISIS', dan sebagainya). Kembalikan HANYA dalam format array",
-        "anchor_start": "(?i)(?:Perbuatan\\s+tersebut\\s+dilakukan(?:.*?)\\s*dengan\\s+cara-cara|Bahwa\\s+hal-ikhwal\\s+keikutsertaan\\s+(?:para\\s+)?Terdakwa\\s+dalam|Menimbang[\\s,]*bahwa\\s+terhadap\\s+alasan\\s+peninjauan\\s+kembali\\s+yang\\s+d[ia]+jukan)",
-        "anchor_end": "(?i)(?:Perbuatan\\s+(?:Mereka\\s+)?Terdakwa\\s+sebagaimana\\s+diatur\\s+dan\\s+diancam|Menimbang[\\s,]*bahwa\\s+berdasarkan\\s+pertimbangan\\s+hukum\\s+di\\s*atas|Menimbang[\\s,]*bahwa\\s*(?:terhadap|atas)\\s*dakwaan|Menimbang[\\s,]*bahwa\\s*untuk\\s*membuktikan)"
+        "anchor_start": "Menimbang,\\s*bahwa.*?(?:fakta-fakta\\s*hukum|diperoleh\\s*fakta\\s*bahwa|fakta\\s*yang\\s*terungkap\\s*dipersidangan)",
+        "anchor_end": "Menimbang,\\s*bahwa\\s*selanjutnya\\s*(?:Majelis|Majelis\\s*Hakim)\\s*akan\\s*mempertimbangkan"
     },
     "defendant_chat_platform": {
         "category": "what",
@@ -465,7 +456,7 @@
         "type": "array",
         "output_format": "json",
         "description": "Daftarkan aplikasi pesan atau platform komunikasi yang digunakan terdakwa untuk merencanakan tindak pidana (contoh: 'Telegram', 'WhatsApp', 'Threema', dan sejenisnya), apabila nama aplikasi/platformnya berbentuk singkatan tetap kembalikan nilainya. Kembalikan bentuk array",
-        "anchor_start": "(?i)(?:Perbuatan\\s+tersebut\\s+dilakukan(?:.*?)\\s*dengan\\s+cara-cara|Bahwa\\s+hal-ikhwal\\s+keikutsertaan\\s+(?:para\\s+)?Terdakwa\\s+dalam|Menimbang[\\s,]*bahwa\\s+terhadap\\s+alasan\\s+peninjauan\\s+kembali\\s+yang\\s+d[ia]+jukan)",
-        "anchor_end": "(?i)(?:Perbuatan\\s+(?:Mereka\\s+)?Terdakwa\\s+sebagaimana\\s+diatur\\s+dan\\s+diancam|Menimbang[\\s,]*bahwa\\s+berdasarkan\\s+pertimbangan\\s+hukum\\s+di\\s*atas|Menimbang[\\s,]*bahwa\\s*(?:terhadap|atas)\\s*dakwaan|Menimbang[\\s,]*bahwa\\s*untuk\\s*membuktikan)"
+        "anchor_start": "Menimbang,\\s*bahwa.*?(?:fakta-fakta\\s*hukum|diperoleh\\s*fakta\\s*bahwa|fakta\\s*yang\\s*terungkap\\s*dipersidangan)",
+        "anchor_end": "Menimbang,\\s*bahwa\\s*selanjutnya\\s*(?:Majelis|Majelis\\s*Hakim)\\s*akan\\s*mempertimbangkan"
     }
 }
