@@ -272,14 +272,14 @@
         "anchor_end": "Menimbang,\\s*bahwa\\s*selanjutnya\\s*(?:Majelis|Majelis\\s*Hakim)\\s*akan\\s*mempertimbangkan"
     },
     "crime_time_range": {
-        "category": "when",
+        "category": "when_and_where",
         "method": "llm",
         "scope": "dynamic",
         "type": "array",
         "output_format": "json",
-        "description": "Ekstrak kronologi kejadian tindak pidana menjadi daftar timeline. Kembalikan HANYA dalam format JSON Array. Setiap objek di dalam array WAJIB memiliki key: 'date' (string, tanggal/bulan/tahun kejadian) dan 'description' (string, deskripsi tindakan yang dilakukan terdakwa pada waktu tersebut).",
-        "anchor_start": "Menimbang,\\s*bahwa.*?(?:fakta-fakta\\s*hukum|diperoleh\\s*fakta\\s*bahwa|fakta\\s*yang\\s*terungkap\\s*dipersidangan)",
-        "anchor_end": "Menimbang,\\s*bahwa\\s*selanjutnya\\s*(?:Majelis|Majelis\\s*Hakim)\\s*akan\\s*mempertimbangkan"
+        "description": "Ekstrak kronologi lengkap tindak pidana terorisme dari teks dakwaan. Pecah setiap peristiwa menjadi objek terpisah. Setiap objek WAJIB memiliki key: 1. 'date' (waktu kejadian), 2. 'description' (detail tindakan), 3. 'classification' (pilih salah satu: Perencanaan, Pelatihan, atau Tindakan), 4. 'location' (nama kabupaten/kota dan provinsi). Kembalikan HANYA dalam format JSON Array.",
+        "anchor_start": "(?i)(?:Perbuatan\\s+tersebut\\s+dilakukan(?:.*?)\\s*dengan\\s+cara-cara|Bahwa\\s+hal-ikhwal\\s+keikutsertaan\\s+(?:para\\s+)?Terdakwa\\s+dalam|Menimbang[\\s,]*bahwa\\s+terhadap\\s+alasan\\s+peninjauan\\s+kembali\\s+yang\\s+d[ia]+jukan)",
+        "anchor_end": "(?i)(?:Perbuatan\\s+(?:Mereka\\s+)?Terdakwa\\s+sebagaimana\\s+diatur\\s+dan\\s+diancam|Menimbang[\\s,]*bahwa\\s+berdasarkan\\s+pertimbangan\\s+hukum\\s+di\\s*atas|Menimbang[\\s,]*bahwa\\s*(?:terhadap|atas)\\s*dakwaan|Menimbang[\\s,]*bahwa\\s*untuk\\s*membuktikan)"
     },
     "crime_location": {
         "category": "where",

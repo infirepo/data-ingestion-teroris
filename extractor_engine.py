@@ -8,9 +8,9 @@ from openai import OpenAI
 
 load_dotenv(find_dotenv(), override=False)
 
-# Konfigurasi OpenAI (bukan lagi OpenRouter)
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
-MODEL = os.getenv("LLM_MODEL", "gpt-4.1-mini")
+# Konfigurasi Moonshot/Kimi API
+MOONSHOT_API_KEY = os.getenv("MOONSHOT_API_KEY", os.getenv("OPENAI_API_KEY", "")).strip()
+MODEL = os.getenv("LLM_MODEL", "moonshot-v1-32k")
 
 @dataclass
 class ExtractionResult:
@@ -137,8 +137,8 @@ class BaseExtractor:
             r"\n\s*MENGADILI\s*\n",
             r"\n\s*MEMUTUSKAN\s*,",
             r"\n\s*MEMUTUSKAN\s*\n",
-            r"\n\s*M\s*E\s*N\s*G\s*A\s*D\s*I\s*L\s*I\s*:"
-            r"\n\s*M\s*E\s*N\s*G\s*A\s*D\s*I\s*L\s*I\s*,"
+            r"\n\s*M\s*E\s*N\s*G\s*A\s*D\s*I\s*L\s*I\s*:",
+            r"\n\s*M\s*E\s*N\s*G\s*A\s*D\s*I\s*L\s*I\s*,",
         ]
 
         footer_start_idx = None
@@ -243,7 +243,10 @@ class BaseExtractor:
     
     def _add_field(self, category: str, field: str, value: Any, 
                    confidence: float = 1.0, source: str = "regex"):
-        """Add field with confidence tracking"""
+        """Add field with confidence tracking, auto-create category if missing"""
+        if category not in self.data:
+            self.data[category] = {}
+            
         if value is not None:
             self.data[category][field] = value
             self.data["metadata"]["confidence_scores"][f"{category}.{field}"] = {
@@ -287,19 +290,19 @@ class BaseExtractor:
             if end_match:
                 end_idx = start_idx + end_match.end()
                 return text[start_idx:end_idx].strip()
-            
-            return text[start_idx:].strip()
+        
+        return text[start_idx:].strip()
 
     def _call_llm_api(self, prompt: str) -> Optional[str]:
         try:
-            if not OPENAI_API_KEY:
-                self.log(" ⚠️ OPENAI_API_KEY belum di-set. Lewati panggilan LLM.")
+            if not MOONSHOT_API_KEY:
+                self.log(" ⚠️ MOONSHOT_API_KEY belum di-set. Lewati panggilan LLM.")
                 return None
 
             self.log(f" [LLM-DEBUG] Mengirim permintaan ke Model: {MODEL}")
             self.log(f" [LLM-DEBUG] Cuplikan Prompt {prompt[:150]}... [truncated]")
 
-            client = OpenAI(api_key=OPENAI_API_KEY)
+            client = OpenAI(api_key=MOONSHOT_API_KEY, base_url="https://api.moonshot.cn/v1")
 
             response = client.chat.completions.create(
                 model=MODEL,
@@ -308,14 +311,12 @@ class BaseExtractor:
                         "role": "system",
                         "content": (
                             "Anda adalah asisten hukum ahli dan data engineer. "
-                            "Tugas Anda adalah mengekstrak informasi spesifik dari putusan pengadilan Indonesia. "
-                            "Jawab secara singkat, padat, dan persis seperti yang diminta di instruksi. "
-                            "Jangan memberikan penjelasan tambahan jika tidak diminta."
-                            "Ekstrak hanya informasi yang secara eksplisit tertulis dalam teks."
-                            "Jangan melakukan inferensi, generalisasi, atau interpretasi."
-                            "Jangan menggunakan pengetahuan eksternal."
-                            "Untuk setiap field berbasis teks (string/array), gunakan kutipan langsung dari teks asli tanpa parafrase kecuali diminta untuk ringkasan."
-                            "Jika informasi tidak disebutkan secara jelas dan eksplisit, isi dengan null. Ingat jangan dikosongkan"
+                            "Tugas Anda mengekstrak informasi spesifik dari putusan pengadilan Indonesia. "
+                            "WAJIB kembalikan output DALAM FORMAT JSON YANG VALID. " # <-- Wajib ada untuk Kimi API
+                            "Jawab secara singkat, padat, dan persis sesuai instruksi tanpa penjelasan tambahan. "
+                            "Ekstrak hanya informasi yang secara eksplisit tertulis dalam teks. "
+                            "Jangan melakukan inferensi, generalisasi, atau interpretasi. "
+                            "Untuk field berbasis teks, gunakan kutipan langsung dari teks asli."
                         ),
                     },
                     {
@@ -323,8 +324,9 @@ class BaseExtractor:
                         "content": prompt,
                     },
                 ],
-                temperature=0.0,
+                temperature=0.1, # Disarankan naikkan ke 0.1 dari 0.0 agar Kimi tidak tersendat saat membuat JSON bersarang
                 max_tokens=4096,
+                response_format={"type": "json_object"},
             )
 
             res_text = response.choices[0].message.content.strip()
@@ -332,7 +334,8 @@ class BaseExtractor:
             return res_text
 
         except Exception as e:
-            self.log(f" ⚠️ Error saat memanggil OpenAI: {str(e)}")
+            # Ubah log error agar lebih jelas saat debugging
+            self.log(f" ⚠️ Error saat memanggil Moonshot API: {str(e)}")
             return None
 
     # -------------------------------
@@ -421,13 +424,10 @@ class BaseExtractor:
     def _build_llm_batch_prompt(
         self, scope_name: str, scope_text: str, fields_spec: List[Dict[str, Any]]
     ) -> str:
-        # Safety net: Truncate jika teks terlalu panjang untuk menghemat token
-        # 20.000 karakter kira-kira 5.000-6.000 token.
-        if len(scope_text) > 20000:
-            self.log(f"   ⚠️ [TOKEN-SAVER] Scope '{scope_name}' terlalu panjang ({len(scope_text)} chars). Dipotong ke 20k chars.")
-            scope_text = scope_text[:20000] + "\n...[TRUNCATED]..."
+        if len(scope_text) > 60000:
+            self.log(f"   ⚠️ [TOKEN-SAVER] Scope '{scope_name}' terlalu panjang ({len(scope_text)} chars). Dipotong ke 60k chars.")
+            scope_text = scope_text[:60000] + "\n...[TRUNCATED]..."
 
-        """Bangun prompt terstruktur untuk beberapa field sekaligus (JSON-only)."""
         fields_desc_lines: List[str] = []
         json_template_lines: List[str] = ["{"]
 
@@ -435,11 +435,16 @@ class BaseExtractor:
             fname = spec["name"]
             ftype = spec.get("type", "string")
             desc = spec.get("description", "")
+            out_fmt = spec.get("output_format", "text") # Ambil parameter output_format
 
             fields_desc_lines.append(f"{i}. {fname} ({ftype}): {desc}".strip())
 
             if ftype == "array":
-                json_template_lines.append(f'  "{fname}": [],')
+                if out_fmt == "json":
+                    # Petunjuk visual eksplisit agar LLM mengisi array dengan object
+                    json_template_lines.append(f'  "{fname}": [ {{ "key": "value" }} ],')
+                else:
+                    json_template_lines.append(f'  "{fname}": [],')
             elif ftype == "boolean":
                 json_template_lines.append(f'  "{fname}": false,')
             else:
@@ -520,6 +525,15 @@ Kembalikan SATU objek JSON dengan field tepat seperti contoh struktur di bawah i
         """Coba parse string LLM menjadi JSON dengan fallback cari blok {...} pertama."""
         if text is None:
             return None
+        
+        # Bersihkan markdown backticks dari Kimi API jika ada
+        text = text.strip()
+        if text.startswith("```json"):
+            text = text[7:]
+        if text.startswith("```"):
+            text = text[3:]
+        if text.endswith("```"):
+            text = text[:-3]
         text = text.strip()
 
         try:
@@ -527,6 +541,7 @@ Kembalikan SATU objek JSON dengan field tepat seperti contoh struktur di bawah i
         except Exception:
             pass
 
+        # Fallback jika masih ada teks aneh di luar JSON
         match = re.search(r"\{.*\}", text, re.DOTALL)
         if match:
             try:
